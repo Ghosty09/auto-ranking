@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Auto Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; display: flex; flex-direction: column; align-items: center; }
+        #admin, #car-list { background: #fff; padding: 36px; margin-top: 30px; border-radius: 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.13); width: 470px; }
+        input, button { font-size: 1.1rem; padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc; margin-bottom: 10px; }
+        button { background: #4CAF50; color: #fff; border: none; cursor: pointer; }
+        .delete-btn { background: #f44336; margin-left: 10px; }
+        #addCarBtn {
+            font-size: 1.2rem;
+            padding: 10px 28px;
+            border-radius: 8px;
+            background: #2196F3;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #addCarBtn:hover { background: #1769aa; }
+    </style>
+</head>
+<body>
+    <h1>Admin: Autos verwalten</h1>
+    <div id="login">
+        <input type="password" id="pw" placeholder="Passwort">
+        <div style="margin:10px 0;">
+            <span id="captcha-question"></span>
+            <input type="text" id="captcha-answer" placeholder="Captcha" style="width:60px;">
+        </div>
+        <button onclick="checkPw()">Login</button>
+        <div id="pw-msg" style="color:red;margin-top:10px;"></div>
+    </div>
+    <div id="admin" style="display:none;">
+        <h2>Auto hinzufügen</h2>
+        <input type="text" id="newCarName" placeholder="Auto Name">
+        <input type="file" id="newCarImg" accept="image/*">
+        <button onclick="addCar()" id="addCarBtn" style="font-size:1.2rem;padding:10px 28px;border-radius:8px;background:#2196F3;color:#fff;border:none;cursor:pointer;transition:background 0.2s;">
+    ➕ Auto hinzufügen
+</button>
+        <h2 style="margin-top:30px;">Alle Autos</h2>
+        <ul id="car-list" style="list-style:none;padding:0;"></ul>
+        <a href="maine.html" style="display:block;margin-top:20px;">⬅ Zurück zur Bewertung</a>
+    </div>
+    <script>
+        let cars = JSON.parse(localStorage.getItem('cars') || "[]");
+cars.forEach(car => {
+  if (!car.img.startsWith("Bilder/") && !car.img.startsWith("http")) {
+    car.img = "Bilder/" + car.img;
+  }
+});
+localStorage.setItem('cars', JSON.stringify(cars));
+
+    let captchaA, captchaB;
+
+    function generateCaptcha() {
+        captchaA = Math.floor(Math.random() * 10) + 1;
+        captchaB = Math.floor(Math.random() * 10) + 1;
+        document.getElementById('captcha-question').textContent = `${captchaA} + ${captchaB} = ?`;
+        document.getElementById('captcha-answer').value = "";
+    }
+
+        function checkPw() {
+            const pw = document.getElementById('pw').value;
+            const captcha = document.getElementById('captcha-answer').value;
+            if (pw === "auto" && Number(captcha) === captchaA + captchaB) {
+                document.getElementById('login').style.display = "none";
+                document.getElementById('admin').style.display = "block";
+                showCars();
+            } else if (pw !== "auto") {
+                document.getElementById('pw-msg').textContent = "Falsches Passwort!";
+                generateCaptcha();
+            } else {
+                document.getElementById('pw-msg').textContent = "Captcha falsch!";
+                generateCaptcha();
+            }
+        }
+
+        function showCars() {
+            const list = document.getElementById('car-list');
+            list.innerHTML = "";
+            cars.forEach((car, idx) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<img src="${car.img}" alt="" style="width:40px;vertical-align:middle;border-radius:5px;margin-right:10px;">
+                    <strong>${car.name}</strong>
+                    <button class="delete-btn" onclick="deleteCar(${idx})">Löschen</button>`;
+                list.appendChild(li);
+            });
+        }
+
+        function addCar() {
+            const name = document.getElementById('newCarName').value.trim();
+            const fileInput = document.getElementById('newCarImg');
+            if (name && fileInput.files.length > 0) {
+
+                let img = fileInput.files[0].name;
+
+                img = "Bilder/" + img;
+                cars.push({ name, img });
+                localStorage.setItem('cars', JSON.stringify(cars));
+                document.getElementById('newCarName').value = "";
+                fileInput.value = "";
+                showCars();
+            } else {
+                alert("Bitte Name und Bild angeben!");
+            }
+        }
+
+        function deleteCar(idx) {
+            if (confirm("Wirklich löschen?")) {
+                cars.splice(idx, 1);
+                localStorage.setItem('cars', JSON.stringify(cars));
+                showCars();
+            }
+        }
+
+        window.onload = generateCaptcha;
+    </script>
+</body>
+</html>
