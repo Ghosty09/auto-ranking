@@ -50,8 +50,7 @@
         <a href="admin.html" style="font-size:1.1rem;">🔒 Zur Admin-Seite</a>
     </div>
     <script>
-        // Nur einmal ausführen, um alte Daten zu löschen:
-        localStorage.removeItem('cars');
+        // localStorage.removeItem('cars'); // Diese Zeile entfernt
         let cars = JSON.parse(localStorage.getItem('cars')) || [
             { name: "BMW M3", img: "bmw m3.png" },
             { name: "VW Golf", img: "VW Golf.png" },
