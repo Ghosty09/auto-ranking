@@ -50,6 +50,149 @@
         <a href="admin.html" style="font-size:1.1rem;">🔒 Zur Admin-Seite</a>
     </div>
     <script>
+        // Nur einmal ausführen, um alte Daten zu löschen:
+        localStorage.removeItem('cars');
+
+        let cars = JSON.parse(localStorage.getItem('cars')) || [
+            { name: "BMW M3", img: "bmw m3.png" },
+            { name: "VW Golf", img: "VW Golf.png" },
+            { name: "Ford Mustang", img: "Mustang.png" },
+            { name: "Porsche 911 GT3", img: "Porsche 911 GT3.png" },
+            { name: "Lamborghini Aventador", img: "lamborghini aventador.png" },
+            { name: "Dodge Challenger", img: "dodge challenger.png" },
+            { name: "Tesla Model S", img: "Tesla Model S.png" }
+        ];
+        let index = 0;
+        let results = [];
+
+        function updateStatus() {
+            const status = document.getElementById('status');
+            if (index < cars.length) {
+                status.textContent = `Auto ${index + 1} von ${cars.length}`;
+            } else {
+                status.textContent = "Fertig!";
+            }
+        }
+
+        function showCar() {
+            if (index < cars.length) {
+                document.getElementById('card').innerHTML = `
+                    <img id="car-img" src="${cars[index].img}" alt="Auto" style="cursor:zoom-in;" onclick="openFullscreen(this)" />
+                    <h2 id="car-name">${cars[index].name}</h2>
+                    <p id="car-desc"></p>
+                    <div id="buttons">
+                        <button class="dislike" onclick="nextCar(false)">👎</button>
+                        <button class="like" onclick="nextCar(true)">👍</button>
+                    </div>
+                `;
+            } else {
+                showResults();
+            }
+            updateStatus();
+        }
+
+        function nextCar(liked) {
+            if (index < cars.length) {
+                results.push({
+                    name: cars[index].name,
+                    img: cars[index].img,
+                    liked: liked
+                });
+            }
+            index++;
+            showCar();
+        }
+
+        function showResults() {
+            let html = "<h2>Deine Bewertung</h2><ul style='list-style:none;padding:0;'>";
+            results.forEach((car, idx) => {
+                const thumbBg = car.liked ? "#4CAF50" : "#f44336";
+                html += `<li style="margin-bottom:15px;">
+                    <img src="${car.img}" alt="${car.name}" style="width:60px;vertical-align:middle;border-radius:5px;margin-right:10px;cursor:zoom-in;" onclick="openFullscreen(this)">
+                    <strong>${car.name}</strong> 
+                    <span style="font-size:22px;display:inline-block;width:38px;height:38px;line-height:38px;text-align:center;border-radius:50%;background:${thumbBg};color:#fff;margin-left:10px;">
+                        ${car.liked ? "👍" : "👎"}
+                    </span>
+                </li>`;
+            });
+            html += "</ul>";
+            html += `
+                <button onclick="restart()" style="margin-top:20px;font-size:22px;padding:14px 32px;border-radius:8px;background:#2196F3;color:#fff;border:none;cursor:pointer;">🔄 Nochmal bewerten</button>
+            `;
+            document.getElementById('card').innerHTML = html;
+        }
+
+        function restart() {
+            index = 0;
+            results = [];
+            showCar();
+        }
+
+        function openFullscreen(img) {
+            if (img.requestFullscreen) {
+                img.requestFullscreen();
+            } else if (img.webkitRequestFullscreen) {
+                img.webkitRequestFullscreen();
+            } else if (img.msRequestFullscreen) {
+                img.msRequestFullscreen();
+            }
+        }
+
+        showCar();
+    </script>
+</body>
+</html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Auto Ranking</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; display: flex; flex-direction: column; align-items: center; }
+        #card { 
+            background: #fff; 
+            padding: 36px; 
+            margin-top: 10px; 
+            border-radius: 18px; 
+            box-shadow: 0 4px 16px rgba(0,0,0,0.13); 
+            width: 470px; 
+            min-height: 600px; 
+            text-align: center; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        #car-img { 
+            width: 100%; 
+            height: 260px; 
+            object-fit: cover;     
+            border-radius: 14px; 
+            margin-bottom: 18px;
+        }
+        #buttons { margin-top: 40px; }
+        button { font-size: 28px; padding: 18px 36px; margin: 0 18px; border: none; border-radius: 8px; cursor: pointer; }
+        .like { background: #4CAF50; color: #fff; }
+        .dislike { background: #f44336; color: #fff; }
+        h1 { font-size: 3rem; margin-top: 30px; }
+        h2 { font-size: 2rem; }
+        #car-name { font-size: 2.2rem; }
+        #car-desc { font-size: 1.3rem; }
+    </style>
+</head>
+<body>
+    <h1>Auto Ranking</h1>
+    <div id="status" style="margin-bottom:10px;font-size:1.2rem;color:#444;"></div>
+    <div id="card">
+        <img id="car-img" src="" alt="Auto" />
+        <h2 id="car-name"></h2>
+        <div id="buttons">
+            <button class="dislike" onclick="nextCar(false)">👎</button>
+            <button class="like" onclick="nextCar(true)">👍</button>
+        </div>
+    </div>
+    <div style="margin-top:30px;">
+        <a href="admin.html" style="font-size:1.1rem;">🔒 Zur Admin-Seite</a>
+    </div>
+    <script>
         // localStorage.removeItem('cars'); // Diese Zeile entfernt
         let cars = JSON.parse(localStorage.getItem('cars')) || [
             { name: "BMW M3", img: "bmw m3.png" },
